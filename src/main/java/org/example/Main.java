@@ -10,7 +10,7 @@ import java.net.URL;
 
 public class Main {
     private static Document getPage() throws IOException {
-        String url = "https://www.wroclaw.pl/pogoda-wroclaw/";
+        String url = "https://pogoda.interia.pl/prognoza-dlugoterminowa-wroclaw,cId,39240";
         Document page = Jsoup.parse(new URL(url), 3000);
         return page;
     }
@@ -19,8 +19,12 @@ public class Main {
         try {
             Document page = getPage();
 
-            // Перевіряємо структуру сторінки
-            Elements weatherInfo = page.select("div.item");
+
+            Elements weatherInfo = page.select("div.weather-forecast-longterm-list");
+            Elements names = weatherInfo.select("span.date");
+            Elements value = weatherInfo.select("span.weather-forecast-longterm-list-entry-forecast-temp");
+            Elements valueFilingLike = weatherInfo.select("span.weather-forecast-longterm-list-entry-forecast-lowtemp");
+//            System.out.println(valueMax.text());
             if (weatherInfo.isEmpty()) {
                 System.out.println("Не вдалося знайти елемент з погодою. Перевірте селектор.");
             } else {
