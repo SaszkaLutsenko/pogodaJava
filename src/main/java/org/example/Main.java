@@ -5,6 +5,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Evaluator;
+
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import java.net.URL;
 
@@ -13,18 +17,23 @@ public class Main {
         String url = "https://pogoda.interia.pl/prognoza-dlugoterminowa-wroclaw,cId,39240";
         Document page = Jsoup.parse(new URL(url), 3000);
         return page;
+//    }
+    private static Pattern patern = Pattern.compile("\\d{2}\\.\\d{2}");
+
+    private String getDateFromString(String stringDate){
+        Matcher matcher = patern.matcher(stringDate);
+        if(matcher.find()){
+            return matcher.group();
+        }
     }
 
     public static void main(String[] args) {
         try {
             Document page = getPage();
-
-
             Elements weatherInfo = page.select("div.weather-forecast-longterm-list");
-            Elements names = weatherInfo.select("span.date");
-            Elements value = weatherInfo.select("span.weather-forecast-longterm-list-entry-forecast-temp");
-            Elements valueFilingLike = weatherInfo.select("span.weather-forecast-longterm-list-entry-forecast-lowtemp");
-//            System.out.println(valueMax.text());
+            Elements stringDate = page.select("div.weather-forecast-longterm-list-entry-hour");
+
+
             if (weatherInfo.isEmpty()) {
                 System.out.println("Не вдалося знайти елемент з погодою. Перевірте селектор.");
             } else {
