@@ -5,7 +5,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.jsoup.select.Evaluator;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -13,36 +12,48 @@ import java.util.regex.Matcher;
 import java.net.URL;
 
 public class Main {
+
     private static Document getPage() throws IOException {
         String url = "https://pogoda.interia.pl/prognoza-dlugoterminowa-wroclaw,cId,39240";
-        Document page = Jsoup.parse(new URL(url), 3000);
-        return page;
-//    }
-    private static Pattern patern = Pattern.compile("\\d{2}\\.\\d{2}");
+        return Jsoup.parse(new URL(url), 3000);
+    }
 
-    private String getDateFromString(String stringDate){
-        Matcher matcher = patern.matcher(stringDate);
-        if(matcher.find()){
+    private static Pattern pattern = Pattern.compile("\\d{2}\\.\\d{2}");
+
+    private static String getDateFromString(String stringDate) {
+        Matcher matcher = pattern.matcher(stringDate);
+        if (matcher.find()) {
             return matcher.group();
         }
+        return "dont found data";
+    }
+
+    private void printForValue(Elements weatherElements, int index){
+        for(int i = 0; i < 4; i++){
+            Element weater = weatherElements.get(index);
+
+        }
+
     }
 
     public static void main(String[] args) {
         try {
+            int index;
             Document page = getPage();
-            Elements weatherInfo = page.select("div.weather-forecast-longterm-list");
-            Elements stringDate = page.select("div.weather-forecast-longterm-list-entry-hour");
+            Elements dateElements = page.select("div.weather-forecast-longterm-list-entry-hour");
+            Elements weatherElements = page.select("div.weather-forecast-longterm-list-entry-forecast");
 
-
-            if (weatherInfo.isEmpty()) {
-                System.out.println("Не вдалося знайти елемент з погодою. Перевірте селектор.");
+            if (dateElements.isEmpty() || weatherElements.isEmpty()) {
+                System.out.println("try again.");
             } else {
-                for (Element element : weatherInfo) {
-                    System.out.println("Погода у Вроцлаві: " + element.text());
+                for (int i = 0; i < 5; i++) {
+                    String date = getDateFromString(dateElements.get(i).text());
+                    String weather = weatherElements.get(i).text();
+                    System.out.println(date + ": " + weather);
                 }
             }
         } catch (IOException e) {
-            System.out.println("Помилка під час отримання сторінки: " + e.getMessage());
+            System.out.println("eror " + e.getMessage());
         }
     }
 }
